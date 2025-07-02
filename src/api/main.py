@@ -44,7 +44,7 @@ async def predict(data: PredictionInput):
         
     except Exception as e:
         logger.error(f"Prediction failed: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
+        # raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/health")
 async def health_check():

@@ -1,24 +1,28 @@
-FROM python:3.9-slim
+FROM python:3.-slim
 
+# Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (build tools and Python headers)
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc python3-dev && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for caching
+# Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY src/ ./src/
 
-# MLflow tracking URI
+# Set MLflow tracking URI (can be overridden at runtime)
 ENV MLFLOW_TRACKING_URI=http://localhost:5000
 
-# Expose API port
+# Expose FastAPI port
 EXPOSE 8000
 
-# Run the API
+# Start the FastAPI app using uvicorn
 CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
